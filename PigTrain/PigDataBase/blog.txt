@@ -1,0 +1,18 @@
+1.移除 ground-truth 中的 colormap
+PASCAL_ROOT="PigTrain/PigDataBase/pig_dataset_voc"
+SEG_FOLDER="${PASCAL_ROOT}/SegmentationClass"
+SEMANTIC_SEG_FOLDER="${PASCAL_ROOT}/SegmentationClassRaw"
+python ./remove_gt_colormap.py \
+    --original_gt_folder="${SEG_FOLDER}" \
+    --output_dir="${SEMANTIC_SEG_FOLDER}"
+2.生成 TFRecord
+OUTPUT_DIR="PigTrain/tfrecord"
+mkdir -p "${OUTPUT_DIR}"
+IMAGE_FOLDER="${PASCAL_ROOT}/JPEGImages"
+LIST_FOLDER="${PASCAL_ROOT}/ImageSets/Segmentation"
+python ./build_voc2012_data.py \
+    --image_folder="${IMAGE_FOLDER}" \
+    --semantic_segmentation_folder="${SEMANTIC_SEG_FOLDER}" \
+    --list_folder="${LIST_FOLDER}" \
+    --image_format="jpg" \
+    --output_dir="${OUTPUT_DIR}"

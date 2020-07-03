@@ -1,0 +1,65 @@
+1.通过该方法可以在anaconda中实现安装指定版本的包
+这个时候，我们可以使用下面的指令来查找我们想要安装的包（以skimage为例）
+$ anaconda search -t conda skimage 
+接着，我们使用show指令来查看该包的详细情况
+$ anaconda show anaconda/tensorflow
+根据提示，我们使用下面的指令install这个包
+$  conda install --channel https://conda.anaconda.org/DavidMertz accelerate-skimage=1.3.0
+--------------------------------------------------------------------------------------------------
+2.当出现找不到指定程序或模板时,可能是因为依赖包的版本问题,或者是找不到依赖包
+--------------------------------------------------------------------------------------------------
+3.为了在git bash中使用wget语句我在Windows/system32中添加了wget.exe
+该程序包是在cnda中找到的windows环境下可适用的版本
+该程序的源文件在F:\python_study\wgetwin-1_5_3_1-binary中
+--------------------------------------------------------------------------------------------------
+4.当使用tensorflow使可能出现错误
+AttributeError: module 'tensorflow' has no attribute 'app'
+此时可能是tensorflow的版本与代码不匹配
+更改版本即可
+--------------------------------------------------------------------------------------------------
+5.在git中打开anaconda虚拟环境需要使用如下语句
+#激活环境
+source activate
+#退出环境
+conda deactivate
+#打开需要的虚拟环境
+conda activate tensorflow
+--------------------------------------------------------------------------------------------------
+6.这里参考调试指令参考local_test.sh，其中有几个比较关键的参数设置如下：
+
+training_number_of_steps： 训练迭代次数，这里只是验证，故设置较小为1000
+train_crop_size：训练图片的裁剪大小，因为我的GPU只有4G，故我将这个设置为513了
+train_batch_size:训练的batchsize，也是因为硬件条件，故保持1,如果想复现官方效果，建议设置8
+tf_initial_checkpoint：预训练的初始checkpoint，这里设置的即是../../init_models/deeplabv3_pascal_train_aug/model.ckpt
+train_logdir: 保存训练权重的目录，注意在开始的创建工程目录的时候就创建了，这里设置为'train/'
+dataset_dir:数据集的地址，前面创建的TFRecords目录。这里设置为'../../tfrecord/'
+--------------------------------------------------------------------------------------------------
+7.如果需要在训练或者验证的时候进行可视化
+可以分别使用以下代码
+#可在http://localhost:6006/中查看loss等的变化
+tensorboard --logdir train/
+#可看到 miou_1.0 的变化，这里指定了6007端口
+tensorboard --logdir eval/ --port 6007
+或同时可视化训练与验证的可视化log
+tensorboard --logdir .
+以上代码均在目录deeplab/datasets/pascal_voc_seg/exp/train_on_train_set中打开
+--------------------------------------------------------------------------------------------------
+8.测试图片的inference脚本,命名为infer.py
+python infer.py \
+    ../../../../g3doc/img/image1.jpg \
+    export/frozen_inference_graph-10.pb
+--------------------------------------------------------------------------------------------------
+9.在.py脚本中动态添加地址
+mport sys
+sys.path.append(r'D:\Code\tf-models\research')
+sys.path.append(r'D:\Code\tf-models\research\slim')  # 以上两处的路径请按照真实的路径添加
+--------------------------------------------------------------------------------------------------
+10.labelme标注后的json文件更改为voc数据集格式
+https://blog.csdn.net/qq_31347869/article/details/91180129
+# 终端输入
+./labelme2voc.py [图像路径] [voc文件夹名称] --labels [label list]
+# 比如
+./labelme2voc.py cat_annotated cat_dataset_voc --labels labels.txt
+--------------------------------------------------------------------------------------------------
+准备PASCAL VOC 2012数据集
+sh download_and_convert_voc2012.sh
